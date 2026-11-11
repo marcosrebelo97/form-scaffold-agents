@@ -12,7 +12,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
-    "check": "npm run typecheck"
+    "check": "npm run typecheck && npm test"
   },
   "dependencies": {
     "@hono/node-server": "^2.1.6",
