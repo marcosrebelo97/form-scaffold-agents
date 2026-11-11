@@ -1,0 +1,99 @@
+{
+  "id": "inspecao-equipamento",
+  "version": 1,
+  "title": "Inspeção preventiva de equipamento",
+  "description": "Feita pela equipe de manutenção na rotina preventiva: conservação, itens de segurança, falhas encontradas e a decisão de liberar o equipamento para operação.",
+  "resource": "inspecoes-equipamento",
+  "sections": [
+    {
+      "id": "identificacao",
+      "title": "Identificação",
+      "fields": [
+        { "name": "codigoEquipamento", "label": "Código do equipamento", "type": "text", "required": true, "minLength": 1, "maxLength": 20 },
+        { "name": "localInstalacao", "label": "Local de instalação", "type": "text", "required": true, "minLength": 1, "maxLength": 40 },
+        { "name": "dataInspecao", "label": "Data da inspeção", "type": "date", "required": true },
+        { "name": "responsavel", "label": "Responsável", "type": "text", "required": true, "minLength": 3, "maxLength": 80 }
+      ]
+    },
+    {
+      "id": "conservacao",
+      "title": "Conservação",
+      "fields": [
+        { "name": "lubrificacaoRealizada", "label": "Lubrificação realizada", "type": "boolean", "required": true },
+        { "name": "notaConservacao", "label": "Nota de conservação", "type": "integer", "required": true, "min": 1, "max": 5 },
+        { "name": "observacoesConservacao", "label": "Observações de conservação", "type": "text", "maxLength": 500 }
+      ]
+    },
+    {
+      "id": "seguranca",
+      "title": "Segurança e documentação",
+      "fields": [
+        { "name": "itensSegurancaOk", "label": "Proteções e sinalização em ordem", "type": "boolean", "required": true },
+        { "name": "itensSegurancaPendentes", "label": "Itens de segurança pendentes", "type": "text", "maxLength": 500 },
+        { "name": "manualDisponivel", "label": "Manual de operação disponível", "type": "boolean", "required": true }
+      ]
+    },
+    {
+      "id": "falhas",
+      "title": "Falhas",
+      "fields": [
+        { "name": "possuiFalhas", "label": "Falhas encontradas", "type": "boolean", "required": true },
+        { "name": "descricaoFalhas", "label": "Descrição das falhas", "type": "text", "maxLength": 1000 },
+        { "name": "fotosFalhas", "label": "Fotos das falhas", "type": "photos", "maxItems": 10, "help": "Referências das fotos já enviadas ao storage." }
+      ]
+    },
+    {
+      "id": "resultado",
+      "title": "Resultado",
+      "fields": [
+        {
+          "name": "situacao",
+          "label": "Situação do equipamento",
+          "type": "enum",
+          "required": true,
+          "options": ["liberado", "liberado-com-restricoes", "bloqueado"]
+        }
+      ]
+    }
+  ],
+  "computed": [
+    {
+      "name": "pendencias",
+      "type": "integer",
+      "description": "Quantidade de pendências encontradas (ver R4)."
+    }
+  ],
+  "rules": [
+    {
+      "id": "R1",
+      "description": "Se possuiFalhas for verdadeiro, descricaoFalhas e pelo menos uma foto em fotosFalhas são obrigatórias."
+    },
+    {
+      "id": "R2",
+      "description": "Se itensSegurancaOk for falso, itensSegurancaPendentes é obrigatório."
+    },
+    {
+      "id": "R3",
+      "description": "Um equipamento sem lubrificação realizada ou com nota de conservação menor que 3 não pode ter a situação \"liberado\"."
+    },
+    {
+      "id": "R4",
+      "description": "pendencias conta 1 para cada condição verdadeira: possui falhas; itens de segurança pendentes; manual indisponível; lubrificação não realizada."
+    }
+  ],
+  "example": {
+    "codigoEquipamento": "CMP-0042",
+    "localInstalacao": "LINHA-03",
+    "dataInspecao": "2026-11-10",
+    "responsavel": "Equipe de manutenção",
+    "lubrificacaoRealizada": true,
+    "notaConservacao": 4,
+    "itensSegurancaOk": false,
+    "itensSegurancaPendentes": "Proteção da correia solta",
+    "manualDisponivel": true,
+    "possuiFalhas": true,
+    "descricaoFalhas": "Vazamento de óleo no cárter",
+    "fotosFalhas": ["fotos/cmp-0042/carter-1.jpg"],
+    "situacao": "liberado-com-restricoes"
+  }
+}
