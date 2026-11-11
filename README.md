@@ -46,7 +46,7 @@ Por isso o projeto separa as responsabilidades:
 ```mermaid
 flowchart TD
     S["specs/&lt;id&gt;.json<br/>escrita e commitada por um humano"] --> G["form-scaffolder<br/>escreve as 9 peças"]
-    G -- "regra ambígua" --> B["BLOQUEADO<br/>perguntas ao autor da spec"]
+    G -- "regra ambígua ou decisão a confirmar" --> B["BLOQUEADO<br/>perguntas ao autor da spec"]
     G --> C{"npm ci · check:scope · npm run check<br/>escopo · tsc · vitest · verificador"}
     C -- "achados por camada" --> G
     C -- verde --> V["form-validator<br/>só leitura: fidelidade das regras,<br/>limites, testes, mensagens"]
@@ -220,6 +220,15 @@ playbook/camadas.md    convenções que o agente segue
 
 As decisões de projeto, com o porquê e o que ficou de fora, estão em
 [DECISIONS.md](DECISIONS.md).
+
+## Trabalhando neste repositório com IA
+
+Os agentes de `.claude/` são o produto: geram e revisam formulários. A
+manutenção do resto (core, verificador, CI) também é feita com o Claude Code,
+e quem a governa é o [`CLAUDE.md`](CLAUDE.md): os invariantes que não podem
+regredir, como "quem gera não altera o gate", e a exigência de teste de
+mutação para qualquer mudança no verificador. Os dois são versionados de
+propósito: fazem parte de como o projeto é mantido.
 
 ## Licença
 
