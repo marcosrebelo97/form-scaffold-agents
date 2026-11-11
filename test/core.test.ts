@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { z } from 'zod';
-import { createApp } from '../src/core/app.js';
+import { MAX_BODY_BYTES, createApp } from '../src/core/app.js';
 import { defineModel, fromRow, toRow } from '../src/core/model.js';
 import { ConstraintError, MemoryRepository } from '../src/core/repository.js';
 import { parseInput, ruleIssue, withRules } from '../src/core/validation.js';
@@ -93,5 +93,23 @@ describe('createApp', () => {
     expect((await app.request('/nao-existe')).status).toBe(404);
     const invalid = await app.request(`/${forms[0]!.resource}`, { method: 'POST', body: '{', headers: { 'content-type': 'application/json' } });
     expect(invalid.status).toBe(422);
+  });
+
+  it('refuses a body over the limit with 413, with or without a Content-Length', async () => {
+    const app = createApp(forms, new MemoryRepository());
+    const path = `/${forms[0]!.resource}`;
+    const big = JSON.stringify({ x: 'a'.repeat(MAX_BODY_BYTES) });
+    const declared = await app.request(path, { method: 'POST', body: big, headers: { 'content-type': 'application/json' } });
+    expect(declared.status).toBe(413);
+    expect(await declared.json()).toEqual({ error: 'Corpo da requisição grande demais.' });
+
+    const stream = new Blob([big]).stream();
+    const chunked = await app.request(path, {
+      method: 'POST',
+      body: stream,
+      headers: { 'content-type': 'application/json' },
+      duplex: 'half',
+    } as RequestInit);
+    expect(chunked.status).toBe(413);
   });
 });
