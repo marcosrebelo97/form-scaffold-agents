@@ -22,6 +22,7 @@ const pecas = { houveTrocaPecas: true, descricaoPecas: 'Rolamento', fotosPecas: 
 function api() {
   const app = createApp([ordemServico], new MemoryRepository());
   return {
+    get: (path: string) => app.request(path),
     post: (body: unknown) =>
       app.request('/ordens-servico', {
         method: 'POST',
@@ -57,7 +58,7 @@ describe('ordem-servico', () => {
     expect(zero).toEqual([{ field: 'diasAtraso', message: ordemServico.messages.fields.diasAtraso }]);
   });
 
-  it('R2: replaced parts require a description and a photo; no replacement forbids the parts cost', async () => {
+  it('R2: replaced parts require a description and a photo; no replacement forbids all three', async () => {
     const errors = await errorsOf(await api().post({ ...valid, houveTrocaPecas: true }));
     expect(errors).toEqual([
       expect.objectContaining({ field: 'descricaoPecas', rule: 'R2' }),
@@ -77,8 +78,11 @@ describe('ordem-servico', () => {
     const cost = await errorsOf(await api().post({ ...valid, custoPecas: 0 }));
     expect(cost).toEqual([expect.objectContaining({ field: 'custoPecas', rule: 'R2' })]);
 
-    // The rule forbids only the cost without replacement, not the description or the photos.
-    expect((await api().post({ ...valid, descricaoPecas: 'Inspecionado', fotosPecas: ['f/1.jpg'] })).status).toBe(201);
+    const noReplacement = await errorsOf(await api().post({ ...valid, ...pecas, houveTrocaPecas: false }));
+    expect(noReplacement).toEqual([
+      expect.objectContaining({ field: 'descricaoPecas', rule: 'R2' }),
+      expect.objectContaining({ field: 'fotosPecas', rule: 'R2' }),
+    ]);
   });
 
   it('R3: warranty forbids parts cost and hourly rate; "avulsa" requires the hourly rate', async () => {
@@ -96,6 +100,10 @@ describe('ordem-servico', () => {
     // The boundary: a zero hourly rate counts as informed.
     expect((await api().post({ ...valid, cobertura: 'avulsa', valorHora: 0 })).status).toBe(201);
 
+    // Warranty without a replacement: R2 already rejects the parts cost, so the field gets one error, not two.
+    const overlap = await errorsOf(await api().post({ ...valid, cobertura: 'garantia', custoPecas: 5 }));
+    expect(overlap).toEqual([expect.objectContaining({ field: 'custoPecas', rule: 'R2' })]);
+
     // "contrato" neither requires nor forbids either value.
     expect((await api().post({ ...valid, ...pecas, custoPecas: 10, valorHora: 100 })).status).toBe(201);
   });
@@ -110,8 +118,11 @@ describe('ordem-servico', () => {
     expect(compute({ ...valid, ...pecas, custoPecas: 1.005 }).custoTotal).toBe(1.01);
     expect(compute({ ...valid, ...pecas, custoPecas: 1.004 }).custoTotal).toBe(1);
 
-    const response = await api().post({ ...valid, ...pecas, custoPecas: 10.1, valorHora: 33.33, cobertura: 'avulsa' });
-    expect(await response.json()).toMatchObject({ custoTotal: 76.76 });
+    const client = api();
+    const response = await client.post({ ...valid, ...pecas, custoPecas: 10.1, valorHora: 33.33, cobertura: 'avulsa' });
+    expect(response.status).toBe(201);
+    const { id } = (await response.json()) as { id: string };
+    expect(await (await client.get(`/ordens-servico/${id}`)).json()).toMatchObject({ custoTotal: 76.76 });
     expect(await errorsOf(await api().post({ ...valid, custoTotal: 1 }))).toEqual([
       expect.objectContaining({ field: 'custoTotal' }),
     ]);

@@ -28,13 +28,16 @@ export const input = withRules(
     if (!value.concluidaNoPrazo && value.diasAtraso === undefined) ruleIssue(ctx, 'R1', messages, 'diasAtraso');
     if (value.concluidaNoPrazo && value.diasAtraso !== undefined) ruleIssue(ctx, 'R1', messages, 'diasAtraso');
     if (value.houveTrocaPecas) {
-      if (!value.descricaoPecas) ruleIssue(ctx, 'R2', messages, 'descricaoPecas');
-      if (!value.fotosPecas?.length) ruleIssue(ctx, 'R2', messages, 'fotosPecas');
-    } else if (value.custoPecas !== undefined) {
-      ruleIssue(ctx, 'R2', messages, 'custoPecas');
+      if (value.descricaoPecas === undefined) ruleIssue(ctx, 'R2', messages, 'descricaoPecas');
+      if (value.fotosPecas === undefined) ruleIssue(ctx, 'R2', messages, 'fotosPecas');
+    } else {
+      for (const field of ['descricaoPecas', 'fotosPecas', 'custoPecas'] as const) {
+        if (value[field] !== undefined) ruleIssue(ctx, 'R2', messages, field);
+      }
     }
     if (value.cobertura === 'garantia') {
-      if (value.custoPecas !== undefined) ruleIssue(ctx, 'R3', messages, 'custoPecas');
+      // Without a replacement, R2 already rejects the parts cost: one error per field.
+      if (value.houveTrocaPecas && value.custoPecas !== undefined) ruleIssue(ctx, 'R3', messages, 'custoPecas');
       if (value.valorHora !== undefined) ruleIssue(ctx, 'R3', messages, 'valorHora');
     }
     if (value.cobertura === 'avulsa' && value.valorHora === undefined) ruleIssue(ctx, 'R3', messages, 'valorHora');

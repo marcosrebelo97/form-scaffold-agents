@@ -65,7 +65,7 @@
     },
     {
       "id": "R2",
-      "description": "Se houveTrocaPecas for verdadeiro, descricaoPecas e pelo menos uma foto em fotosPecas são obrigatórias. Se for falso, custoPecas não pode ser informado."
+      "description": "Se houveTrocaPecas for verdadeiro, descricaoPecas e pelo menos uma foto em fotosPecas são obrigatórias. Se for falso, descricaoPecas, fotosPecas e custoPecas não podem ser informados."
     },
     {
       "id": "R3",
@@ -73,7 +73,7 @@
     },
     {
       "id": "R4",
-      "description": "custoTotal é custoPecas mais horasTrabalhadas vezes valorHora (o que não foi informado conta como zero), arredondado a 2 casas."
+      "description": "custoTotal é custoPecas mais horasTrabalhadas vezes valorHora (o que não foi informado conta como zero), arredondado a 2 casas, meio centavo para cima."
     },
     {
       "id": "R5",
