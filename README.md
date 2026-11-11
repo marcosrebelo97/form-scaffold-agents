@@ -213,6 +213,8 @@ playbook/camadas.md    convenções que o agente segue
 - Valores em reais aceitam frações de centavo na entrada (`0.001`); só o
   calculado é arredondado. Resolver pede casas decimais na spec e no
   verificador.
+- Sem autenticação: é uma demonstração. Por isso a API escuta só em
+  `127.0.0.1`; `HOST=0.0.0.0` a expõe.
 - Repositório em memória. Trocar por Postgres é implementar `Repository`.
 - Sem migração entre versões de formulário.
 
