@@ -34,7 +34,9 @@ mesma forma, arquivo por arquivo.
   antes do mínimo.
 - **Opcional é ausente, nunca `null` nem vazio:** um campo não obrigatório usa
   só `.optional()`. Texto em branco e lista vazia são recusados, mesmo em
-  campo opcional. A mensagem desses campos diz "... ou omita o campo".
+  campo opcional. A mensagem desses campos diz "... ou omita o campo", a não
+  ser que uma regra possa exigi-lo: aí ela só dá o formato, porque omitir
+  também seria um erro.
 - **Tipos de campo → coluna:** `text` e `enum` → `text`, `integer` →
   `integer`, `decimal` → `numeric`, `boolean` → `boolean`, `date` → `date`,
   `photos` → `text[]`. Coluna de campo opcional é `nullable: true`; a de um
@@ -47,7 +49,8 @@ mesma forma, arquivo por arquivo.
   então basta testar a presença do campo. Um texto em branco é erro de
   estrutura, com a mensagem do campo.
 - **Regras de cálculo** ficam em `compute`, uma função pura exportada, testada
-  sem HTTP. Valores monetários são arredondados a 2 casas.
+  sem HTTP. Valores monetários calculados são arredondados a 2 casas, meio
+  centavo para cima.
 - **Mensagens** em pt-BR, no imperativo, com os limites da spec ("até 20
   caracteres", "de 1 a 5").
 - **Testes de regra** cobrem o caso que viola a regra e o caso que a satisfaz,

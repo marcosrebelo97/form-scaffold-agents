@@ -206,6 +206,13 @@ classe: nenhum texto ou lista em branco passa, em nenhum formulário.
 garantido por código. O teste de mutação prova que a regra cobre a classe
 inteira; a primeira tentativa deste exemplo não cobria.
 
+Quando o achado não é verificável por código, ele vira convenção do playbook
+ou instrução do agente, e passa a valer para o próximo formulário. Exemplo:
+no `ordem-servico`, a revisão notou que a mensagem de um campo exigido por
+regra dizia "ou omita o campo", e que o agente anotou uma decisão "a
+confirmar" mas entregou `PRONTO`. As duas coisas viraram texto no playbook e
+no `form-scaffolder`.
+
 ## O que foi decidido não fazer
 
 - **Versionamento de formulário e migrações.** `version` existe na spec e no

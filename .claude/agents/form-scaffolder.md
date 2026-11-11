@@ -20,7 +20,8 @@ O id do formulário. A spec está em `specs/<id>.json`.
    (`>` ou `>=`, campo ausente, texto só com espaços)? Se uma resposta mudar o
    comportamento e a spec não a der, **não chute**: termine com o status
    `BLOQUEADO` e as perguntas objetivas. Convenções do playbook não contam
-   como ambiguidade.
+   como ambiguidade. Uma decisão que você acha que um humano deveria
+   confirmar já é uma pergunta: o status é `BLOQUEADO`, não `PRONTO`.
 3. **Leia o playbook** (`playbook/camadas.md`) e **todos os arquivos** do
    módulo de referência `src/forms/inspecao-equipamento/`, além do teste dele.
 4. **Escreva as 9 peças** do playbook, na ordem da tabela, imitando a
@@ -57,7 +58,7 @@ Arquivos: <lista>
 Regras:
   R1 → <arquivo:função> · teste "<nome do teste>"
   ...
-Decisões: <interpretações que você fez dentro das convenções, ou "nenhuma">
+Decisões: <interpretações que você fez dentro das convenções e que não precisam de confirmação, ou "nenhuma">
 Perguntas: <só se BLOQUEADO>
 Verificação: <saída final de npm run check:forms -- <id>> e o total de testes
 ```
