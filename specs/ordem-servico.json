@@ -1,0 +1,99 @@
+{
+  "id": "ordem-servico",
+  "version": 1,
+  "title": "Encerramento de ordem de serviço",
+  "description": "Preenchido pelo técnico ao fechar uma ordem de serviço de manutenção: prazo, peças trocadas, horas, cobertura e se o equipamento volta à operação.",
+  "resource": "ordens-servico",
+  "sections": [
+    {
+      "id": "identificacao",
+      "title": "Identificação",
+      "fields": [
+        { "name": "codigoEquipamento", "label": "Código do equipamento", "type": "text", "required": true, "maxLength": 20 },
+        { "name": "numeroOrdem", "label": "Número da ordem de serviço", "type": "text", "required": true, "maxLength": 40 },
+        { "name": "dataEncerramento", "label": "Data de encerramento", "type": "date", "required": true },
+        { "name": "tecnico", "label": "Técnico responsável", "type": "text", "required": true, "minLength": 3, "maxLength": 80 }
+      ]
+    },
+    {
+      "id": "prazo",
+      "title": "Prazo e liberação",
+      "fields": [
+        { "name": "concluidaNoPrazo", "label": "Concluída no prazo", "type": "boolean", "required": true },
+        { "name": "diasAtraso", "label": "Dias de atraso", "type": "integer", "min": 1, "max": 60 },
+        { "name": "equipamentoLiberado", "label": "Equipamento liberado para operação", "type": "boolean", "required": true },
+        { "name": "motivoNaoLiberacao", "label": "Motivo da não liberação", "type": "text", "maxLength": 500 }
+      ]
+    },
+    {
+      "id": "pecas",
+      "title": "Peças e mão de obra",
+      "fields": [
+        { "name": "houveTrocaPecas", "label": "Houve troca de peças", "type": "boolean", "required": true },
+        { "name": "descricaoPecas", "label": "Peças trocadas", "type": "text", "maxLength": 1000 },
+        { "name": "fotosPecas", "label": "Fotos das peças trocadas", "type": "photos", "maxItems": 10 },
+        { "name": "custoPecas", "label": "Custo das peças (R$)", "type": "decimal", "min": 0, "max": 500000 },
+        { "name": "horasTrabalhadas", "label": "Horas trabalhadas", "type": "decimal", "required": true, "min": 0.5, "max": 500 },
+        { "name": "valorHora", "label": "Valor da hora técnica (R$)", "type": "decimal", "min": 0, "max": 1000 }
+      ]
+    },
+    {
+      "id": "cobertura",
+      "title": "Cobertura",
+      "fields": [
+        {
+          "name": "cobertura",
+          "label": "Cobertura do serviço",
+          "type": "enum",
+          "required": true,
+          "options": ["garantia", "contrato", "avulsa"]
+        }
+      ]
+    }
+  ],
+  "computed": [
+    {
+      "name": "custoTotal",
+      "type": "decimal",
+      "description": "Custo total da ordem de serviço, em reais (ver R4)."
+    }
+  ],
+  "rules": [
+    {
+      "id": "R1",
+      "description": "Se concluidaNoPrazo for falso, diasAtraso é obrigatório. Se for verdadeiro, diasAtraso não pode ser informado."
+    },
+    {
+      "id": "R2",
+      "description": "Se houveTrocaPecas for verdadeiro, descricaoPecas e pelo menos uma foto em fotosPecas são obrigatórias. Se for falso, custoPecas não pode ser informado."
+    },
+    {
+      "id": "R3",
+      "description": "Com cobertura \"garantia\", custoPecas e valorHora não podem ser informados: o fabricante cobre peças e mão de obra. Com cobertura \"avulsa\", valorHora é obrigatório."
+    },
+    {
+      "id": "R4",
+      "description": "custoTotal é custoPecas mais horasTrabalhadas vezes valorHora (o que não foi informado conta como zero), arredondado a 2 casas."
+    },
+    {
+      "id": "R5",
+      "description": "Se equipamentoLiberado for falso, motivoNaoLiberacao é obrigatório. Se for verdadeiro, motivoNaoLiberacao não pode ser informado."
+    }
+  ],
+  "example": {
+    "codigoEquipamento": "CMP-0042",
+    "numeroOrdem": "OS-2026-0187",
+    "dataEncerramento": "2026-11-12",
+    "tecnico": "Equipe de manutenção",
+    "concluidaNoPrazo": false,
+    "diasAtraso": 2,
+    "equipamentoLiberado": true,
+    "houveTrocaPecas": true,
+    "descricaoPecas": "Rolamento do eixo principal",
+    "fotosPecas": ["fotos/cmp-0042/rolamento.jpg"],
+    "custoPecas": 380.5,
+    "horasTrabalhadas": 3.5,
+    "valorHora": 120,
+    "cobertura": "avulsa"
+  }
+}
